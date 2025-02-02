@@ -1,5 +1,5 @@
 # Created by Micha Roon at 13.06.23
-@wip
+
 Feature: Token Service Use Cases
   Demonstration of the understanding of the Hedera Hashgraph Token Service and transaction model
 
@@ -21,7 +21,7 @@ Feature: Token Service Use Cases
     And The token has 2 decimals
     And The token is owned by the account
     And An attempt to mint tokens fails
-
+@wip
   Scenario: Transfer tokens between 2 accounts
     Given A first hedera account with more than 10 hbar
     And A second Hedera account
