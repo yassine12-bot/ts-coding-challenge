@@ -15,7 +15,7 @@ const { KeyList } = require("@hashgraph/sdk");
 
 // Pre-configured client for test network (testnet)
 const client = Client.forTestnet()
-const secondclient = Client.forTestnet()
+
 
 //Set the operator with the account ID and private keyc
 
@@ -70,26 +70,44 @@ When(/^The message "([^"]*)" is published to the topic$/, async function (messag
   const transactionStatus = receipt.status;
 
   console.log("The message transaction status: " + transactionStatus.toString());
+
+  // Store the transaction timestamp for later use
+  this.messageTimestamp = txResponse.transactionId.validStart;
 });
-
-//===============================================================================================================
-
 Then(/^The message "([^"]*)" is received by the topic and can be printed to the console$/, async function (message: string) {
-  new TopicMessageQuery()
-    .setTopicId(this.topicId)
-    .subscribe(client, null, (msg) => {
-      let receivedMessage = Buffer.from(msg.contents).toString('utf8');
-      console.log(`${msg.consensusTimestamp.toDate()} Received: ${receivedMessage}`);
-      
-      if (receivedMessage === message) {
-        console.log("Received expected message:", message);
-        // You might want to add an assertion here
-        // assert.strictEqual(receivedMessage, message);
-      }
+  const timeoutMs = 30000; // 30 seconds timeout
+  const startTime = this.messageTimestamp || new Date();
+
+  try {
+    const receivedMessage = await new Promise<string>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout waiting for message"));
+      }, timeoutMs);
+
+      new TopicMessageQuery()
+        .setTopicId(this.topicId)
+        .setStartTime(startTime)
+        .subscribe(client, null, (msg) => {
+          let receivedMessage = Buffer.from(msg.contents).toString('utf8');
+          console.log(`${msg.consensusTimestamp.toDate()} Received: ${receivedMessage}`);
+          
+          if (receivedMessage === message) {
+            clearTimeout(timeout);
+            resolve(receivedMessage);
+          }
+        });
     });
 
-  // Wait for a short period to allow time for message reception
-  await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log("Received expected message:", receivedMessage);
+    assert.strictEqual(receivedMessage, message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error receiving message:", error.message);
+    } else {
+      console.error("An unknown error occurred");
+    }
+    throw error;
+  }
 });
 //===============================================================================================================
 
