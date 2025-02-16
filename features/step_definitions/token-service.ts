@@ -1,7 +1,7 @@
 
 import { Given, Then, When } from "@cucumber/cucumber";
 import { accounts } from "../../src/config";
-import { AccountBalanceQuery, Hbar, HbarUnit, TokenId, TokenAssociateTransaction, TransferTransaction, Status, TokenSupplyType,AccountCreateTransaction, AccountId, Client,TransactionReceipt, PrivateKey, TokenCreateTransaction, TokenInfoQuery, TokenMintTransaction, TokenType, Key, AccountInfoQuery } from "@hashgraph/sdk";
+import { AccountBalanceQuery, Hbar, HbarUnit,  TransferTransaction, AccountCreateTransaction, AccountId, Client,TransactionReceipt, PrivateKey, TokenCreateTransaction, TokenInfoQuery, TokenMintTransaction, TokenType } from "@hashgraph/sdk";
 
 import assert from "node:assert";
 
@@ -145,15 +145,7 @@ Then(/^An attempt to mint tokens fails$/, async function () {
 // scenario 3                 ù!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 let clientID: AccountId = AccountId.fromString(accounts[0].id); 
 let clientPrivateKey: PrivateKey = PrivateKey.fromStringED25519(accounts[0].privateKey);
-let firstAccountId: AccountId;
-let firstAccountPrivateKey: PrivateKey;
-let secondAccountId: AccountId;
-let secondAccountPrivateKey: PrivateKey;
-let thirdAccountId: AccountId;
-let thirdAccountPrivateKey: PrivateKey;
-let fourthAccountId: AccountId;
-let fourthAccountPrivateKey: PrivateKey;
-let transferTransaction: TransferTransaction;
+client.setOperator(clientID, clientPrivateKey);
 
 
 
